@@ -22,6 +22,7 @@ option(BUILD_DOCS "Build Doxygen documentation" OFF)
 option(BUILD_DOCS_ONLY "Configure only the documentation target" OFF)
 option(BUILD_ALL_DOCS "Build documentation for all libraries" OFF)
 option(BUILD_BENCHMARKS "Build the benchmark harness" OFF)
+option(BUILD_TESTING "Build the test suite" OFF)
 option(DEV_MODE "Enable development mode" OFF)
 
 if(BUILD_DOCS_ONLY)
