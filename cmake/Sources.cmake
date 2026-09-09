@@ -5,4 +5,6 @@
 # When adding or removing a source file, update this list.
 
 set(ANTHONY_SOURCES_COMMON
+    sources/GradleRunner.cpp
+    sources/Jvm.cpp
 )

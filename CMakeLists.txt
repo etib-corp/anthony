@@ -24,6 +24,7 @@ option(BUILD_ALL_DOCS "Build documentation for all libraries" OFF)
 option(BUILD_BENCHMARKS "Build the benchmark harness" OFF)
 option(BUILD_TESTING "Build the test suite" OFF)
 option(DEV_MODE "Enable development mode" OFF)
+option(ANTHONY_USE_TOOLING_API "Use the Gradle Tooling API via JNI (requires a JDK)" ON)
 
 if(BUILD_DOCS_ONLY)
     set(BUILD_DOCS ON)
@@ -70,6 +71,32 @@ if(NOT BUILD_DOCS_ONLY)
     # target_link_libraries(${PROJECT_NAME}
     #     PUBLIC
     # )
+
+    # 06b. JNI (Gradle Tooling API backend)
+    if(ANTHONY_USE_TOOLING_API)
+        find_package(JNI)
+        if(JNI_FOUND)
+            target_compile_definitions(${PROJECT_NAME}
+                PRIVATE
+                    ANTHONY_USE_TOOLING_API
+            )
+            # We only need the JNI headers: the JVM is loaded dynamically at
+            # runtime (dlopen/LoadLibrary), so we must NOT link against a
+            # specific libjvm (that would pin the client JVM and clash with the
+            # runtime-selected JDK).
+            target_include_directories(${PROJECT_NAME}
+                PRIVATE
+                    ${JNI_INCLUDE_DIRS}
+            )
+            if(UNIX)
+                target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_DL_LIBS})
+            endif()
+        else()
+            message(WARNING
+                "JNI not found; building without the Gradle Tooling API backend "
+                "(gradlew subprocess fallback will be used).")
+        endif()
+    endif()
 
     # 08. Backend-specific configuration
 
@@ -158,3 +185,21 @@ endif()
 # 12. Examples
 
 add_subdirectory(examples)
+
+# 13. Java bridge (Gradle Tooling API)
+
+if(ANTHONY_USE_TOOLING_API)
+    set(_GRADLEW "${CMAKE_CURRENT_SOURCE_DIR}/java/gradlew")
+    if(EXISTS "${_GRADLEW}")
+        add_custom_target(gradle_runner_bridge
+            COMMAND ${_GRADLEW} fatJar
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/java
+            COMMENT "Building the Gradle runner bridge fat jar"
+            VERBATIM
+        )
+    else()
+        message(STATUS
+            "Gradle wrapper not found; skipping gradle_runner_bridge target. "
+            "Build the bridge jar manually in java/ (see README).")
+    endif()
+endif()
