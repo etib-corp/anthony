@@ -226,4 +226,3 @@ const char *gradle_runner_error_string(GradleRunnerError error);
 }
 #endif
 
-#endif /* ANTHONY_GRADLE_RUNNER_H */
