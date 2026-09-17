@@ -6,6 +6,7 @@ set(TEST_HEADERS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/headers")
 
 # Explicit test source list (no file(GLOB)) for reproducible builds.
 set(TEST_SOURCES
+    sources/test_gradle_runner.cpp
 )
 
 # Fetch GoogleTest

@@ -1,6 +1,6 @@
 #include "ANTHony/GradleRunner.h"
 
-#include "Jvm.hpp"
+#include "ANTHony/Jvm.hpp"
 
 #include <atomic>
 #include <chrono>
